@@ -6,10 +6,10 @@ Create a macOS menu bar application using Go and the Fyne toolkit that displays 
 
 1. **Phase 1: Setup Dependencies and Basic App Structure**
     - **Objective:** Initialize the Fyne dependency and create the basic application structure with proper initialization
-    - **Files/Functions to Modify/Create:** 
+    - **Files/Functions to Modify/Create:**
         - [go.mod](go.mod) - Add Fyne v2 dependency
         - [main.go](main.go) - Create with basic app initialization and main function
-    - **Tests to Write:** 
+    - **Tests to Write:**
         - `TestAppInitialization` - Verify app can be created without panic
         - `TestModuleDependencies` - Verify Fyne dependency is properly loaded
     - **Steps:**
