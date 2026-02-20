@@ -1,11 +1,21 @@
 package main
 
-import "fyne.io/fyne/v2"
+import "fyne.io/systray"
 
-func createMenu(application fyne.App) *fyne.Menu {
-	aboutItem := fyne.NewMenuItem("About", func() {
-		showAboutDialog(application)
-	})
+func createMenu() {
+	mAbout := systray.AddMenuItem("About", "Show application information")
+	systray.AddSeparator()
+	mQuit := systray.AddMenuItem("Quit", "Quit OSX Notifier")
 
-	return fyne.NewMenu("", aboutItem)
+	go func() {
+		for {
+			select {
+			case <-mAbout.ClickedCh:
+				showAboutDialog(nil)
+			case <-mQuit.ClickedCh:
+				systray.Quit()
+				return
+			}
+		}
+	}()
 }

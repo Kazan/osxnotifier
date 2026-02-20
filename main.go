@@ -13,7 +13,7 @@ func onReady() {
 	systray.SetTemplateIcon(iconData, iconData)
 	systray.SetTitle("OSX Notifier")
 	systray.SetTooltip("OSX Notifier")
-	createMenu(nil)
+	createMenu()
 }
 
 func onExit() {
