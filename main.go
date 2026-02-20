@@ -24,4 +24,5 @@ func setupSystemTray(application fyne.App) {
 	}
 
 	desktopApp.SetSystemTrayIcon(theme.NewThemedResource(getIconResource()))
+	desktopApp.SetSystemTrayMenu(createMenu(application))
 }
