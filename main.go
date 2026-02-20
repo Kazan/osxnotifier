@@ -11,7 +11,7 @@ func main() {
 func onReady() {
 	iconData := getIconData()
 	systray.SetTemplateIcon(iconData, iconData)
-	systray.SetTitle("OSX Notifier")
+	systray.SetTitle("")
 	systray.SetTooltip("OSX Notifier")
 	createMenu()
 }
