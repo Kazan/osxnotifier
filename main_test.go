@@ -6,20 +6,28 @@ import (
 	"testing"
 )
 
-func TestAppInitialization(t *testing.T) {
+func TestOnReadySetup(t *testing.T) {
 	t.Helper()
-	t.Setenv("FYNE_DRIVER", "test")
 
 	defer func() {
 		if recovered := recover(); recovered != nil {
-			t.Fatalf("app initialization panicked: %v", recovered)
+			t.Fatalf("onReady panicked: %v", recovered)
 		}
 	}()
 
-	application := initializeApp()
-	if application == nil {
-		t.Fatal("expected initialized app to be non-nil")
-	}
+	onReady()
+}
+
+func TestOnExitCleanup(t *testing.T) {
+	t.Helper()
+
+	defer func() {
+		if recovered := recover(); recovered != nil {
+			t.Fatalf("onExit panicked: %v", recovered)
+		}
+	}()
+
+	onExit()
 }
 
 func TestModuleDependenciesUpdated(t *testing.T) {
@@ -31,24 +39,24 @@ func TestModuleDependenciesUpdated(t *testing.T) {
 	}
 
 	content := string(goModContent)
-	
+
 	// Check that fyne.io/systray is a direct dependency (not indirect)
 	if !strings.Contains(content, "fyne.io/systray") {
 		t.Fatal("expected fyne.io/systray to be present in go.mod dependencies")
 	}
-	
+
 	// Verify it's a direct dependency by checking it appears before the indirect section
 	lines := strings.Split(content, "\n")
 	foundSystray := false
 	inIndirectSection := false
-	
+
 	for _, line := range lines {
 		trimmedLine := strings.TrimSpace(line)
-		
+
 		if strings.Contains(trimmedLine, "// indirect") {
 			inIndirectSection = true
 		}
-		
+
 		if strings.Contains(trimmedLine, "fyne.io/systray") {
 			foundSystray = true
 			if inIndirectSection || strings.Contains(trimmedLine, "// indirect") {
@@ -57,7 +65,7 @@ func TestModuleDependenciesUpdated(t *testing.T) {
 			break
 		}
 	}
-	
+
 	if !foundSystray {
 		t.Fatal("fyne.io/systray not found in go.mod")
 	}

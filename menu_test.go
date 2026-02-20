@@ -6,7 +6,7 @@ func TestMenuCreation(t *testing.T) {
 	t.Helper()
 	t.Setenv("FYNE_DRIVER", "test")
 
-	menu := createMenu(initializeApp())
+	menu := createMenu(nil)
 	if menu == nil {
 		t.Fatal("expected menu to be non-nil")
 	}
@@ -20,7 +20,7 @@ func TestMenuItems(t *testing.T) {
 	t.Helper()
 	t.Setenv("FYNE_DRIVER", "test")
 
-	menu := createMenu(initializeApp())
+	menu := createMenu(nil)
 	if menu == nil {
 		t.Fatal("expected menu to be non-nil")
 	}
