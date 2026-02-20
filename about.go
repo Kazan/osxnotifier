@@ -27,12 +27,16 @@ func showAboutDialog(application fyne.App) {
 	}
 
 	runOnUIThread(func() {
+		// Create a hidden window for the dialog parent
 		aboutWindow := application.NewWindow("About")
+		aboutWindow.Resize(fyne.NewSize(1, 1))
+
 		aboutDialog := newInformationDialog(appName, aboutDialogContent(), aboutWindow)
 		aboutDialog.SetOnClosed(func() {
 			aboutWindow.Close()
 		})
-		aboutWindow.Show()
+
+		// Don't show the window, only show the dialog
 		aboutDialog.Show()
 	})
 }
