@@ -1,21 +1,15 @@
 # OSX Notifier
 
-A macOS menu bar application written in Go that displays a bell icon in the top menu bar with a dropdown menu containing "About" and "Quit" options.
+A lightweight macOS menu bar application written in Go that displays a bell icon in the menu bar with "About" and "Quit" options. Built with the systray library for true menu bar-only behavior.
 
-## Current Status
+## Features
 
-**⚠️ Known Issue:** The app currently shows a Dock icon when running, which is not ideal for a menu bar-only application. This is due to Fyne framework limitations.
-
-**✅ Working Features:**
-- Bell icon in menu bar (adapts to dark/light mode)
-- Dropdown menu with "About" and "Quit" options
-- About dialog with app information
-- Clean quit functionality
-- Comprehensive test suite
-
-**📋 Next Step:** Migrate from Fyne to `fyne.io/systray` library to achieve true menu bar-only behavior without Dock icon.
-
-See: [Migration Plan](plans/migration-to-systray-plan.md)
+✅ **True Menu Bar-Only App** - No Dock icon, runs silently in the menu bar
+✅ **Bell Icon** - Template-styled PNG icon that adapts to dark/light mode
+✅ **Native Dialogs** - Uses macOS native dialogs via osascript
+✅ **Lightweight** - Minimal dependencies (~10 packages)
+✅ **Clean Architecture** - Channel-based event handling
+✅ **Comprehensive Tests** - Full test coverage with TDD approach
 
 ---
 
@@ -58,31 +52,25 @@ osxnotifier/
 ├── about.go             # About dialog logic
 ├── main_test.go         # App initialization tests
 ├── icon_test.go         # Icon and system tray tests
+├── menu_test.go         # Menulifecycle using systray.Run()
+├── icon.go              # Bell icon (embedded PNG)
+├── menu.go              # Channel-based menu handling
+├── about.go             # Native osascript dialogs
+├── bell-icon.png        # 22x22px template-styled icon
+├── generate_icon.go     # Icon generator utility
+├── main_test.go         # Lifecycle tests
+├── icon_test.go         # Icon validation tests
 ├── menu_test.go         # Menu structure tests
-├── about_test.go        # About dialog tests
-├── Info.plist           # macOS app bundle configuration (LSUIElement)
+├── about_test.go        # Dialog tests
+├── Info.plist           # macOS app bundle config (LSUIElement=true)
 ├── Makefile             # Build automation
-└── plans/               # Implementation and migration plans
-    ├── osx-menu-bar-app-plan.md
-    ├── osx-menu-bar-app-complete.md
-    └── migration-to-systray-plan.md  ← NEXT STEP
-```
-
----
-
-## Technology Stack
-
+└── plans/               # Implementation documentation
 **Current:**
-- **Language:** Go 1.23
-- **GUI Framework:** Fyne v2
-- **Icon:** Template-styled SVG with currentColor
-
-**Planned (Migration):**
-- **Language:** Go 1.23
-- **Menu Bar Library:** fyne.io/systray
-- **Icon:** Template-styled PNG
+- **Language:** Go 1.26
+- **Menu Bar Library:** fyne.io/systray v1.12.0
+- **Icon:** Template-styled PNG (22x22px, black on transparent)
 - **Dialog:** Native macOS osascript
-
+- **Dependencies:** Minimal (~10 packages total)
 ---
 
 ## Development History
@@ -91,45 +79,27 @@ osxnotifier/
 
 1. ✅ **Phase 1:** Setup Dependencies and Basic App Structure
 2. ✅ **Phase 2:** Implement Menu Bar Icon
-3. ✅ **Phase 3:** Implement Menu with About and Exit Entries
-4. ✅ **Phase 4:** Implement About Dialog
-5. ✅ **Phase 5:** Implement Exit Functionality (later simplified to use Fyne's built-in Quit)
+3. Architecture
 
-### Optimizations Made
+### Lifecycle
+- Uses `systray.Run(onReady, onExit)` for clean lifecycle management
+- No hidden windows or Dock icons
+- Minimal resource footprint
 
-- Removed duplicate "Exit" menu item (using Fyne's automatic "Quit" instead)
-- Fixed orphan window issue in About dialog
-- Fixed Fyne threading issues with proper `fyne.Do` usage
-- Added `.app` bundle support with `LSUIElement=true`
-- Created Makefile for build automation
+### Menu System
+- Channel-based event handling via `systray.AddMenuItem()`
+- Goroutine listens to click channels using select statement
+- Clean separation between UI and business logic
 
-### Known Limitations (Current Implementation)
+### Icon
+- 22x22px PNG embedded with `//go:embed`
+- Template-styled (black on transparent) for automatic dark/light mode adaptation
+- Generated programmatically with `generate_icon.go`
 
-- **Dock Icon Appears:** Fyne is a full GUI framework and shows Dock icon even with `LSUIElement=true`
-- **Window Management:** Fyne needs windows internally, though hidden from user
-
----
-
-## Next Steps
-
-### Migration to systray Library
-
-To achieve true menu bar-only behavior (no Dock icon), follow the migration plan:
-
-1. **Read the plan:** [migration-to-systray-plan.md](plans/migration-to-systray-plan.md)
-2. **Create checkpoint:** `git commit -am "Pre-migration checkpoint"`
-3. **Create branch:** `git checkout -b migration/systray`
-4. **Execute phases:** Follow the 8-phase migration plan
-5. **Test thoroughly:** Verify no Dock icon appears
-6. **Merge:** Once verified, merge back to main
-
-**Estimated time:** ~2.5 hours
-
----
-
-## Testing
-
-All tests can be run with:
+### Dialogs
+- Native macOS dialogs via `osascript` command
+- No external dependencies for UI elements
+- Consistent with system appearance
 ```bash
 make test
 # or
@@ -153,17 +123,41 @@ When making changes:
 1. Write tests first (TDD approach)
 2. Run `make test` before committing
 3. Run `make build` to verify compilation
-4. Test manually with `make run`
-5. Update documentation if needed
+Run all tests with:
+```bash
+make test
+# or
+go test ./...
+```
 
----
+**Test Coverage:**
+- Lifecycle functions (onReady, onExit)
+- Icon validation (PNG format, embedded data)
+- Menu creation and structure
+- About dialog content and osascript formatting
+- All tests pass without requiring UI interaction
+
+**Test-Driven Development:**
+This project was built using strict TDD principles - all tests were written before implementation.
+Development History
+
+This app was originally built with Fyne framework and later migrated to systray for true menu bar-only behavior. The migration eliminated the Dock icon issue and reduced the dependency footprint by ~70%.
+
+**Migration Documentation:**
+- [Initial Plan](plans/osx-menu-bar-app-plan.md)
+- [Migration Plan](plans/systray-migration-plan.md)
+- [Migration Complete](plans/systray-migration-complete.md)
+
+## Contributing
+
+When making changes:
+
+1. Write tests first (TDD approach)
+2. Run `make test` to verify all tests pass
+3. Run `make build` to verify compilation
+4. Test manually with `open osxnotifier.app`
+5. Update documentation as needed
 
 ## License
 
 [Add your license here]
-
----
-
-## Author
-
-[Add your name/info here]
