@@ -11,7 +11,7 @@ func createMenu() {
 		for {
 			select {
 			case <-mAbout.ClickedCh:
-				showAboutDialog(nil)
+					showAboutDialog()
 			case <-mQuit.ClickedCh:
 				systray.Quit()
 				return

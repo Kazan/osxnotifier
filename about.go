@@ -2,9 +2,8 @@ package main
 
 import (
 	"fmt"
-
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/dialog"
+	"os/exec"
+	"strings"
 )
 
 const (
@@ -13,30 +12,24 @@ const (
 	appDescription = "A macOS menu bar application"
 )
 
-var runOnUIThread = fyne.Do
-
-var newInformationDialog = dialog.NewInformation
-
-func aboutDialogContent() string {
-	return fmt.Sprintf("%s\nVersion: %s\n%s", appName, appVersion, appDescription)
+var runOsaScript = func(script string) error {
+	cmd := exec.Command("osascript", "-e", script)
+	return cmd.Run()
 }
 
-func showAboutDialog(application fyne.App) {
-	if application == nil {
-		return
-	}
+func escapeAppleScriptString(value string) string {
+	escaped := strings.ReplaceAll(value, "\\", "\\\\")
+	return strings.ReplaceAll(escaped, "\"", "\\\"")
+}
 
-	runOnUIThread(func() {
-		// Create a hidden window for the dialog parent
-		aboutWindow := application.NewWindow("About")
-		aboutWindow.Resize(fyne.NewSize(1, 1))
+func showAboutDialog() {
+	message := fmt.Sprintf("%s\\n\\nVersion: %s\\n\\n%s", appName, appVersion, appDescription)
 
-		aboutDialog := newInformationDialog(appName, aboutDialogContent(), aboutWindow)
-		aboutDialog.SetOnClosed(func() {
-			aboutWindow.Close()
-		})
+	script := fmt.Sprintf(
+		`display dialog "%s" with title "About %s" buttons {"OK"} default button "OK"`,
+		escapeAppleScriptString(message),
+		escapeAppleScriptString(appName),
+	)
 
-		// Don't show the window, only show the dialog
-		aboutDialog.Show()
-	})
+	_ = runOsaScript(script)
 }
