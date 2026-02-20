@@ -5,6 +5,16 @@ import (
 	"testing"
 )
 
+// TestIconResource verifies icon bytes are returned from the embedded resource
+func TestIconResource(t *testing.T) {
+	t.Helper()
+
+	iconData := getIconData()
+	if len(iconData) == 0 {
+		t.Fatal("expected embedded icon resource to be non-empty")
+	}
+}
+
 // TestIconDataNotEmpty verifies that the icon data is loaded and not empty
 func TestIconDataNotEmpty(t *testing.T) {
 	t.Helper()
